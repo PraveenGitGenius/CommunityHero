@@ -13,11 +13,21 @@ import plotly.graph_objects as go
 from geopy.geocoders import Nominatim
 import pandas as pd
 from io import BytesIO
+from dotenv import load_dotenv
 
 # ──────────────────────────────────────────
 # CONFIG & SETUP
 # ──────────────────────────────────────────
 os.makedirs("uploads", exist_ok=True)
+load_dotenv()
+
+api_key = os.getenv("GEMINI_API_KEY")
+
+if not api_key:
+    st.error(" GEMINI_API_KEY not found in .env file")
+    st.stop()
+
+genai.configure(api_key=api_key)
 
 st.set_page_config(
     page_title="Community Hero",
@@ -257,7 +267,7 @@ def init_state():
         "achievements": [],
         "ai_result": None,
         "pending_report": None,
-        "api_key_set": False,
+        
     }
     for k, v in defaults.items():
         if k not in st.session_state:
@@ -281,17 +291,7 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-    # API key input
-    with st.expander(" Configuration", expanded=not st.session_state.api_key_set):
-        api_key = st.text_input("Gemini API Key", type="password", placeholder="", help="Get your key from Google AI Studio")
-        if api_key:
-            try:
-                genai.configure(api_key=api_key)
-                st.session_state.api_key_set = True
-                st.success("✓ Connected")
-            except Exception as e:
-                st.error("Invalid key")
-
+    
     st.markdown("---")
     pages = ["Dashboard", "Report Issue", "Live Feed", "My Profile", "About"]
     for pg in (pages):
@@ -486,9 +486,7 @@ elif st.session_state.page == "Report Issue":
     st.markdown('<div class="sec-title"> Report a Community Issue</div>', unsafe_allow_html=True)
     st.markdown('<div class="sec-sub">Upload a photo — our Gemini AI will instantly analyze, categorize, and draft an official complaint</div>', unsafe_allow_html=True)
 
-    if not st.session_state.api_key_set:
-        st.warning("⚠️ Please add your Gemini API key in the sidebar to enable AI analysis.")
-        st.stop()
+    
 
     col_form, col_result = st.columns([1, 1.1], gap="large")
 
@@ -863,12 +861,12 @@ elif st.session_state.page == "My Profile":
             """, unsafe_allow_html=True)
 
     with col_lb:
-        st.markdown("##### 🥇 Community Leaderboard")
+        st.markdown("#####  Community Leaderboard")
 
         leaderboard = [
-            ("RK","Rahul K.", 1240, "#EFF6FF","#0369A1","🥇"),
-            ("PM","Priya M.", 980, "#FFFBEB","#92400E","🥈"),
-            ("AS","Amit S.",  760, "#FEF2F2","#991B1B","🥉"),
+            ("RK","Rahul K.", 1240, "#EFF6FF","#0369A1","1"),
+            ("PM","Priya M.", 980, "#FFFBEB","#92400E","2"),
+            ("AS","Amit S.",  760, "#FEF2F2","#991B1B","3"),
             ("DJ","Deepa J.", 550, "#F0F9FF","#0369A1","4"),
             ("VB","Vikram B.",430, "#F5F3FF","#6D28D9","5"),
         ]
@@ -895,7 +893,7 @@ elif st.session_state.page == "My Profile":
 
         # XP guide
         st.markdown("<div style='height:16px'></div>", unsafe_allow_html=True)
-        st.markdown("##### 💡 How to Earn XP")
+        st.markdown("#####  How to Earn XP")
         xp_actions = [("📸","Submit a report","+50 XP"),("👍","Verify a report","+10 XP"),("✅","Report gets resolved","+100 XP"),("🔥","3-day reporting streak","+150 XP"),("🏆","Reach new level","Bonus XP")]
         for icon, action, pts in xp_actions:
             st.markdown(f"""
@@ -952,4 +950,4 @@ elif st.session_state.page == "About":
         """)
 
     st.markdown("---")
-    st.info(" Built for **Socities** — Community Hero Problem Statement")
+    st.info(" Built for **REAL LIFE CHALLENGES** — PRAVEEN......")
